@@ -1,25 +1,25 @@
 import os
 
-nomeProduto=dict() #dicionário nome do produto:ID
-unidadeProduto=dict() #dicionário nome do produto: unidade de medida
-estoqueProduto=dict() #dicionário nome do produto: estoque
+registroProduto=dict() #dicionário nome do produto:ID
 
 
 def novoProduto(produto,idProduto,unidade,quantidade): #função para adicionar um novo produto
-        nomeProduto[produto]=(idProduto)
-        unidadeProduto[produto]=(unidade)
-        estoqueProduto[produto]=(quantidade)
+        registroProduto[idProduto]={"produto":produto,"unidade":unidade,"quantidade":quantidade}
 def adicionarProduto(produto,quantidade): #função para adicionar produtos ao estoque
-     estoqueProduto[produto]=estoqueProduto[produto]+quantidade
+    for chave, dados in registroProduto.items():
+        if produto.upper() == dados["produto"].upper():
+            registroProduto[chave]["quantidade"] += quantidade
+            break
 
-def removerProduto(produto): 
-            
-        estoqueProduto[produto]=estoqueProduto[produto]-quantidade
-
+def removerProduto(produto,quantidade): 
+     for chave, dados in registroProduto.items():
+        if produto.upper() == dados["produto"].upper():
+            registroProduto[chave]["quantidade"] -= quantidade
+            break
 def pesquisarProduto(produto):
-            for chave, valor in nomeProduto:
+            for chave in registroProduto:
                 if produto in chave:
-                    print(nomeProduto[chave])
+                    print(registroProduto[chave])
                 
           
 
@@ -34,11 +34,11 @@ while menu!=0:
         if menu != 10:
             print('Lista de produtos:')
             print('---------------------------------------------------------------------------------\n')
-        for chave,valor in nomeProduto.items():
+        for chave,dados in registroProduto.items():
             if chave is None:
                 continue     
             else: 
-                 print(f'ID: {idProduto} | Nome do produto: {chave} | Unidade de medida: {unidadeProduto[chave]} | Quantidade: {estoqueProduto[chave]:.2f}')
+                 print(f'ID: {chave} | Nome do produto: {dados["produto"]} | Unidade de medida: {dados["unidade"]} | Quantidade: {dados["quantidade"]:.2f}')
         
         
         print("\nDigite a opção desejada:\n")
@@ -53,62 +53,70 @@ while menu!=0:
         match menu:
 
             case 1: 
-                os.system('cls')
+                #os.system('cls')
                 print("Entrou na função adicionar novo produtos\n")
-                produto=input('Digite o nome do produto:\n')
-                unidade=input('Digite a unidade de medida:\n')
+                produto=input('Digite o nome do produto:\n').upper()
+                unidade=input('Digite a unidade de medida:\n').upper()
                 idProduto=idProduto+1
                 quantidade=float(input('Digite a quantidade:\n'))
                 novoProduto(produto,idProduto,unidade,quantidade)
                 print('Produto adicionado\n')
                 
             case 2:
-               os.system('cls')
+               #os.system('cls')
                print("Entrou na função adicionar produtos ao estoque\n") 
-               produto=input('Digite o nome do produto:\n')
+               produto=input('Digite o nome do produto:\n').upper()
                encontrado = False
-               for chave in nomeProduto: #permite escrever o nome parcialmente e filtra caso não encontro nada
-                    if produto in chave:
-                        produto=chave
+               for chave,dados in registroProduto.items(): #permite escrever o nome parcialmente e filtra caso não encontro nada
+                    if produto in dados["produto"]:
+                        idProduto=chave
                         encontrado = True
-               if not encontrado:
+                        quantidade=float(input('Digite a quantidade de produtos para adicionar ao estoque:\n'))
+                        adicionarProduto(produto,quantidade)
+                        print(f'O valor em estoque de {produto} é de {registroProduto[idProduto]["quantidade"]:.2f}')      
+               if  encontrado==False:
                     print('Produto não encontrado! Tente novamente.\n')
                
-               quantidade=float(input('Digite a quantidade de produtos para adicionar ao estoque:\n'))
-               adicionarProduto(produto,quantidade)
-               print(f'O valor em estoque de {produto} é de {estoqueProduto[produto]:.2f}')      
+                     
             
             
             case 3: 
-                os.system('cls')
-                print("Entrou na função remover produtos do estoque\n")
-                produto=input('Digite o produto que a ser removido\n')
-                encontrado = False
-                for chave in nomeProduto: #permite escrever o nome parcialmente e filtra caso não encontro nada
-                    if produto in chave:
-                        produto=chave
+               #os.system('cls')
+               print("Entrou na função remover produtos ao estoque\n") 
+               produto=input('Digite o nome do produto:\n').upper()
+               encontrado = False
+               for chave,dados in registroProduto.items(): #permite escrever o nome parcialmente e filtra caso não encontro nada
+                    if produto in dados["produto"]:
+                        idProduto=chave
                         encontrado = True
-                if not encontrado:
+                        quantidade=float(input('Digite a quantidade de produtos para remover ao estoque:\n'))
+                        removerProduto(produto,quantidade)
+                        print(f'O valor em estoque de {produto} é de {registroProduto[idProduto]["quantidade"]:.2f}')
+               if encontrado==False:
                     print('Produto não encontrado! Tente novamente.\n')
-                quantidade=float(input('Digite a quantidade de produtos a serem removida:\n'))        
-                removerProduto(produto)
-                print(f'Produto removido. Nova quantidade é de {estoqueProduto[produto]:2f}')
+               
+               
 
 
             case 4: 
-                os.system('cls')
+                
+                #os.system('cls')
                 print("Entrou na função pesquisar produtos\n")
-                produto = input('Digite o produto que deseja pesquisar:\n')
+                produto = input('Digite o produto que deseja pesquisar:\n').upper()
                 encontrado = False
 
-                for chave in nomeProduto: #permite escrever o nome parcialmente e filtra caso não encontro nada
-                    if produto in chave:
-                     print("Produto:", chave)
-                     print("ID:", nomeProduto[chave])
-                     print("Unidade:", unidadeProduto[chave])
-                     encontrado = True
-                if not encontrado:
-                 print("Produto não encontrado! Tente Novamente.\n")
+                for chave, dados in registroProduto.items():
+                    if produto in dados["produto"].upper():
+
+                        print("ID:", chave)
+                        print("Produto:", dados["produto"].upper())
+                        print("Quantidade:", dados["quantidade"])
+                        print("Unidade:", dados["unidade"].upper())
+                        print()
+                        encontrado = True
+
+                if encontrado == False:
+                     print("Produto não encontrado! Tente Novamente.\n")
                 
 
 
